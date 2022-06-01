@@ -1,29 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import conn from '../../lib/db'
-// import jwt from 'jwt'
+import jwt from 'jsonwebtoken'
 
 type Data = {
     ok: boolean
     userExists: boolean
+    data: any
 }
 
-type userData = {
-    email: string,
-    password: string
+const secretKey : any = process.env.SECRET_KEY;
+
+type userType = {
+    email: string
 }
 
-// const generateToken =  (user : userData) : string => {
-//     const token = jwt.sign(
-//         {
-//             email: user.email
-//         }, 
-//         process.env.SECRET_KEY, 
-//         {
-//             expiresIn: '10h'
-//         }
-//     );
-//     return token;
-// }
+const generateToken =  (user: userType) => {
+    const token : string = jwt.sign(
+        {
+            email: user.email,
+        }, 
+        secretKey, 
+        {
+            expiresIn: '10h'
+        }
+    );
+    return token;
+}
+
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
@@ -35,7 +38,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
             findUserQuery,
             [email]
         )
-        console.log(userResult.rows);
+        if(userResult.length > 0) console.log(userResult.rows);
        
         const query = `INSERT INTO users(email, password) VALUES($1, $2)`
 
@@ -44,14 +47,15 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                 query,
                 values,
                 (err: Error, result: any) => {
-                    console.log("Error :", err)
+                    if(err) console.log("Error :", err)
                     console.log("Result: ", result)
                 }
             )
-            res.status(200).send( { ok: true, userExists: false })
+            const token : string = generateToken({ email })
+            res.status(200).send( { ok: true, userExists: false, data: token })
         }
-        else res.status(200).send( {ok: false, userExists: true });
+        else res.status(200).send( {ok: false, userExists: true, data: null });
     } catch ( error ) {
-        res.status(400).send({ ok: false, userExists: true })
+        res.status(400).send({ ok: false, userExists: true, data: null })
     }
 };
