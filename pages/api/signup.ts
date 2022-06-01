@@ -38,7 +38,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
             findUserQuery,
             [email]
         )
-        if(userResult.length > 0) console.log(userResult.rows);
+        if(userResult.rows.length > 0) console.log(userResult.rows);
        
         const query = `INSERT INTO users(email, password) VALUES($1, $2)`
 

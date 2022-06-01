@@ -4,8 +4,9 @@ import jwtDecode from 'jwt-decode';
 const initialUser = {
     user: null
 };
+const SSR = typeof window === 'undefined'
 
-if(sessionStorage.getItem("jwtToken")) {
+if(!SSR && localStorage.getItem("jwtToken")) {
     const token  = localStorage.getItem("jwtToken");
     const decodedToken = jwtDecode(token)
     if(decodedToken.exp * 1000 < Date.now()) {
@@ -44,7 +45,7 @@ const AuthProvider = (props) => {
     const [state, dispatch] = useReducer(AuthReducer, initialUser);
 
     const login = (userData) => {
-        localStorage.setItem("jwtToken", userData.token);
+        localStorage.setItem("jwtToken", userData.data);
         dispatch({
             type: 'LOGIN',
             payload: userData

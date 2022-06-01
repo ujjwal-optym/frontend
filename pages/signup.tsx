@@ -58,6 +58,9 @@ const SignIn : NextPage = () => {
         onSuccess(data) {
             context.login(data)
             console.log("mutation -> : ", data);
+            if(data.data != null) {
+                localStorage.setItem("jwtToken", data.data);
+            }
             // Navigate to Home page
         },
         onError(err: string) {
