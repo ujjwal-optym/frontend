@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import conn from '../../lib/db'
-import jwt from 'jwt'
+// import jwt from 'jwt'
 
 type Data = {
     ok: boolean
@@ -12,18 +12,18 @@ type userData = {
     password: string
 }
 
-const generateToken =  (user : userData) : string => {
-    const token = jwt.sign(
-        {
-            email: user.email
-        }, 
-        process.env.SECRET_KEY, 
-        {
-            expiresIn: '10h'
-        }
-    );
-    return token;
-}
+// const generateToken =  (user : userData) : string => {
+//     const token = jwt.sign(
+//         {
+//             email: user.email
+//         }, 
+//         process.env.SECRET_KEY, 
+//         {
+//             expiresIn: '10h'
+//         }
+//     );
+//     return token;
+// }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
