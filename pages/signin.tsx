@@ -2,9 +2,9 @@ import { NextPage } from "next"
 import axios from "axios"
 import Link from "next/link"
 import Head from "next/head"
-import dynamic from "next/dynamic"
+import { useRouter } from "next/router"
 
-import { useReducer, useContext } from "react";
+import { useEffect, useReducer, useContext } from "react";
 import { useMutation } from 'react-query'
 
 import * as React from 'react';
@@ -22,7 +22,7 @@ const SignIn : NextPage = () => {
 
     const context = useContext(AuthContext);
     const { user } = context;
-    const HomePage = dynamic(() => import("./"));
+    const Router = useRouter()
 
     type Data = {
         email: string,
@@ -55,7 +55,6 @@ const SignIn : NextPage = () => {
     };
 
     const [state, dispatch] = useReducer(reducer, initialValue);
-    const LoginPage = dynamic(() => import("./signin"));
 
     const { mutate, isLoading } = useMutation(signInUser, {
         onSuccess(data) {
@@ -63,6 +62,7 @@ const SignIn : NextPage = () => {
             console.log("mutation -> : ", data);
             if(data.token != null) {
                 localStorage.setItem("jwtToken", data.token);
+                Router.push('/');
             }
             // Navigate to Home page
         },
@@ -75,8 +75,22 @@ const SignIn : NextPage = () => {
         mutate(state)
     }
 
-    if( user ) return <HomePage/>;
-    else return (
+    if( user ) {
+        typeof window !== 'undefined' && Router.push('/');
+    }
+    // useEffect(() => {
+    //     // redirect to home if already logged in
+    //     if (user) {
+    //         Router.push('/');
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [ user ]);
+
+    // if( user ) {
+    //     return <div>Please wait. Redirecting......</div>;
+    // }
+    // else
+    return (
         <div style={{ textAlign: "center", margin: "auto"}}>
             <Head>
                 <title>Assignment - SignIn</title>
@@ -127,10 +141,8 @@ const SignIn : NextPage = () => {
                             Submit
                         </Button>
                     </Grid>
-                    <Grid item xs={8}>
-                        <h4>   
-                            <Link href = "/" > Back Home </Link>
-                        </h4> 
+                    <Grid item xs={8}>    
+                        <Link href = "/signup" color="blue"> Dont have an account? Sign-Up  </Link>
                     </Grid>
                 </Grid>
             </Paper>  

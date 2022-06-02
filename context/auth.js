@@ -1,6 +1,5 @@
 import React, { createContext, useReducer } from 'react';
 import jwtDecode from 'jwt-decode';
-
 const initialUser = {
     user: null
 };

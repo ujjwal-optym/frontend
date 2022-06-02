@@ -4,7 +4,7 @@ import Link from "next/link"
 import Head from "next/head"
 import { useRouter } from "next/router"
 
-import { useReducer, useContext } from "react";
+import { useReducer, useContext, useEffect } from "react";
 import { useMutation } from 'react-query'
 
 import * as React from 'react';
@@ -16,20 +16,13 @@ import TextField from "@mui/material/TextField";
 import  Paper  from "@mui/material/Paper"
 
 import { AuthContext } from '../context/auth';
-import dynamic from "next/dynamic";
 
 
-const SignIn : NextPage = () => {
+const SignUp : NextPage = () => {
 
     const context = useContext(AuthContext);
     const { user } = context;
-    const HomePage = dynamic(() => import("./"));
     const Router = useRouter()
-
-    React.useEffect(() => {
-        if ( user ) return; // do nothing if the user is logged in
-        Router.replace("/signup", "/", { shallow: true });
-    }, [ user ]);
 
     type Data = {
         email: string,
@@ -62,7 +55,6 @@ const SignIn : NextPage = () => {
     };
 
     const [state, dispatch] = useReducer(reducer, initialValue);
-    const LoginPage = dynamic(() => import("./signin"));
 
     const { mutate, isLoading } = useMutation(addUser, {
         onSuccess(data) {
@@ -80,10 +72,23 @@ const SignIn : NextPage = () => {
 
     const handleSubmit = () : void => {
         mutate(state)
+        Router.push('/');
     }
 
-    if( user ) return <HomePage/>
-    else return (
+    if( user ) {
+        typeof window !== 'undefined' && Router.push('/');
+    }
+
+    // useEffect(() => {
+    //     // redirect to home if already logged in
+    //     if (user) {
+    //         Router.push('/');
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
+    // if(user) return <div>Please wait. Redirecting......</div>;
+    // else 
+    return (
         <div style={{ textAlign: "center", margin: "auto"}}>
             <Head>
                 <title>Assignment - SignUp</title>
@@ -100,7 +105,7 @@ const SignIn : NextPage = () => {
                 >
                     <Grid item xs={8}>
                         <h3>   
-                            <Link href = "/" > Back Home </Link>
+                            Sign - Up
                         </h3> 
                     </Grid>
                     <Grid item xs={12}>
@@ -134,7 +139,9 @@ const SignIn : NextPage = () => {
                             Submit
                         </Button>
                     </Grid>
-                
+                    <Grid item xs={8}>    
+                        <Link href = "/signin" color="blue"> Alreay Have an account? Sign-In  </Link>
+                    </Grid>
                 </Grid>
             </Paper>  
             ) }
@@ -142,4 +149,4 @@ const SignIn : NextPage = () => {
     )
 }
 
-export default SignIn
+export default SignUp
