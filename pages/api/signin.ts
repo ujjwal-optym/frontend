@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import conn from '../../lib/db'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt';
 
 type Data = {
     ok: boolean
@@ -30,23 +31,30 @@ const generateToken =  (user: userType) => {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
         const values = [email , password]
-        console.log(values);
-        const findUserQuery = `SELECT * FROM users WHERE email = $1 AND password = $2`;
+        // console.log(values);
+        const findUserQuery = `SELECT * FROM users WHERE email = $1`;
         const userResult : any = await conn.query(
             findUserQuery,
-            values
+            [email]
         )
+        // console.log("res: ", userResult.rows[0].password)
         // const errors = {};
         if(userResult.rows.length === 0) {
             res.status(401).send({ok: false, userExists: false, token: null});
         }
         else {
-            const token = generateToken({ email });
-            res.status(200).send({ok: true, userExists: true, token})
+            if (bcrypt.compareSync(password, userResult.rows[0].password)) {
+                const token = generateToken({ email });
+                res.status(200).send({ok: true, userExists: true, token})
+            }
+            else {
+                res.status(401).send({ok: false, userExists: false, token: null})
+            }
         }
     } catch ( error ) {
+        console.log(error)
         res.status(400).send({ ok: false, userExists: true, token : null })
     }
 };

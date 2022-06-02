@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import conn from '../../lib/db'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt';
 
 type Data = {
     ok: boolean
@@ -30,7 +31,9 @@ const generateToken =  (user: userType) => {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
-        const { email, password } = req.body;
+        var { email, password } = req.body;
+        password = bcrypt.hashSync(password, 10);
+        console.log(password)
         const values = [email , password]
 
         const findUserQuery = `SELECT * FROM users WHERE email = $1`;
@@ -48,7 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                 values,
                 (err: Error, result: any) => {
                     if(err) console.log("Error :", err)
-                    console.log("Result: ", result)
+                    // console.log("Result: ", result)
                 }
             )
             const token : string = generateToken({ email })
