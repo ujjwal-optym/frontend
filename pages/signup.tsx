@@ -2,6 +2,8 @@ import { NextPage } from "next"
 import axios from "axios"
 import Link from "next/link"
 import Head from "next/head"
+import { useRouter } from "next/router"
+
 import { useReducer, useContext } from "react";
 import { useMutation } from 'react-query'
 
@@ -20,6 +22,14 @@ import dynamic from "next/dynamic";
 const SignIn : NextPage = () => {
 
     const context = useContext(AuthContext);
+    const { user } = context;
+    const HomePage = dynamic(() => import("./"));
+    const Router = useRouter()
+
+    React.useEffect(() => {
+        if ( user ) return; // do nothing if the user is logged in
+        Router.replace("/signup", "/", { shallow: true });
+    }, [ user ]);
 
     type Data = {
         email: string,
@@ -58,12 +68,12 @@ const SignIn : NextPage = () => {
         onSuccess(data) {
             context.login(data)
             console.log("mutation -> : ", data);
-            if(data.data != null) {
-                localStorage.setItem("jwtToken", data.data);
+            if(data.token != null) {
+                localStorage.setItem("jwtToken", data.token);
             }
             // Navigate to Home page
         },
-        onError(err: string) {
+        onError(err: any) {
           throw new Error(err)
         }
     });
@@ -72,11 +82,11 @@ const SignIn : NextPage = () => {
         mutate(state)
     }
 
-
-    return (
+    if( user ) return <HomePage/>
+    else return (
         <div style={{ textAlign: "center", margin: "auto"}}>
             <Head>
-                <title>Assignment - SignIn</title>
+                <title>Assignment - SignUp</title>
             </Head>        
             { isLoading ? <h1>loading</h1> : (   
             <Paper style={{width: "30%", margin: "auto", marginTop: "5%", paddingBottom: "4%"}}>

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 type Data = {
     ok: boolean
     userExists: boolean
-    token: null | string
+    token: string | null
 }
 
 const secretKey : any = process.env.SECRET_KEY;
@@ -32,30 +32,21 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
         const { email, password } = req.body;
         const values = [email , password]
-
-        const findUserQuery = `SELECT * FROM users WHERE email = $1`;
+        console.log(values);
+        const findUserQuery = `SELECT * FROM users WHERE email = $1 AND password = $2`;
         const userResult : any = await conn.query(
             findUserQuery,
-            [email]
+            values
         )
-        if(userResult.rows.length > 0) console.log(userResult.rows);
-       
-        const query = `INSERT INTO users(email, password) VALUES($1, $2)`
-
+        // const errors = {};
         if(userResult.rows.length === 0) {
-            const result = await conn.query(
-                query,
-                values,
-                (err: Error, result: any) => {
-                    if(err) console.log("Error :", err)
-                    console.log("Result: ", result)
-                }
-            )
-            const token : string = generateToken({ email })
-            res.status(200).send( { ok: true, userExists: false, token })
+            res.status(401).send({ok: false, userExists: false, token: null});
         }
-        else res.status(200).send( {ok: false, userExists: true, token: null });
+        else {
+            const token = generateToken({ email });
+            res.status(200).send({ok: true, userExists: true, token})
+        }
     } catch ( error ) {
-        res.status(400).send({ ok: false, userExists: true, token: null })
+        res.status(400).send({ ok: false, userExists: true, token : null })
     }
 };
