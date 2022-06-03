@@ -4,7 +4,7 @@ import Link from "next/link"
 import Head from "next/head"
 import { useRouter } from "next/router"
 
-import { useEffect, useReducer, useContext } from "react";
+import { useReducer, useContext, useState } from "react";
 import { useMutation } from 'react-query'
 
 import * as React from 'react';
@@ -16,6 +16,7 @@ import TextField from "@mui/material/TextField";
 import  Paper  from "@mui/material/Paper"
 
 import { AuthContext } from '../context/auth';
+import { Typography } from "@mui/material"
 
 
 const SignIn : NextPage = () => {
@@ -32,7 +33,8 @@ const SignIn : NextPage = () => {
         const { data: response } = await axios.post('/api/signin', data);
         return response;
     };
-    
+    const [errors, setErrors] = useState<any>(null);
+
     const initialValue = {
         email: '',
         password: '',
@@ -57,17 +59,25 @@ const SignIn : NextPage = () => {
     const [state, dispatch] = useReducer(reducer, initialValue);
 
     const { mutate, isLoading } = useMutation(signInUser, {
-        onSuccess(data) {
-            context.login(data)
+        onSuccess(data: any) {
+            if(data.ok) context.login(data)
             console.log("mutation -> : ", data);
+            if(!data.userExists) {
+                setErrors('Invalid Credentials');
+            }
+
             if(data.token != null) {
                 localStorage.setItem("jwtToken", data.token);
                 Router.push('/');
             }
             // Navigate to Home page
         },
-        onError(err: string) {
-          throw new Error(err)
+        onError(err: any) {
+            // console.log(err.response.data.userExists);
+            if(err.respons.data.userExists === false)
+            setErrors('Invalid Credentials');
+            console.log(errors);
+            throw new Error(err);
         }
     });
 
@@ -95,7 +105,7 @@ const SignIn : NextPage = () => {
             <Head>
                 <title>Assignment - SignIn</title>
             </Head>        
-            { isLoading ? <h1>loading</h1> : (   
+             
             <Paper style={{width: "30%", margin: "auto", marginTop: "5%", paddingBottom: "4%"}}>
                 <Grid 
                     container 
@@ -141,12 +151,19 @@ const SignIn : NextPage = () => {
                             Submit
                         </Button>
                     </Grid>
+                    {
+                        errors && ( 
+                            <Grid item xs={8}>    
+                                <Typography color="red" >{errors}</Typography>
+                            </Grid>
+                        )
+                    }
                     <Grid item xs={8}>    
                         <Link href = "/signup" color="blue"> Dont have an account? Sign-Up  </Link>
                     </Grid>
                 </Grid>
+                
             </Paper>  
-            ) }
         </div>
     )
 }

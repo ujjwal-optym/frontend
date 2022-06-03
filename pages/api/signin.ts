@@ -33,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
         let { email, password } = req.body;
         const values = [email , password]
-        // console.log(values);
+        console.log(values);
         const findUserQuery = `SELECT * FROM users WHERE email = $1`;
         const userResult : any = await conn.query(
             findUserQuery,
@@ -42,7 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
         // console.log("res: ", userResult.rows[0].password)
         // const errors = {};
         if(userResult.rows.length === 0) {
-            res.status(401).send({ok: false, userExists: false, token: null});
+            res.status(200).send({ok: false, userExists: false, token: null});
         }
         else {
             if (bcrypt.compareSync(password, userResult.rows[0].password)) {
@@ -50,11 +50,11 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                 res.status(200).send({ok: true, userExists: true, token})
             }
             else {
-                res.status(401).send({ok: false, userExists: false, token: null})
+                res.status(200).send({ok: false, userExists: false, token: null})
             }
         }
     } catch ( error ) {
         console.log(error)
-        res.status(400).send({ ok: false, userExists: true, token : null })
+        res.status(400).send({ ok: false, userExists: false, token : null })
     }
 };
