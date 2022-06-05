@@ -33,7 +33,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
         var { email, password } = req.body;
         password = bcrypt.hashSync(password, 10);
-        console.log(password)
         const values = [email , password]
 
         const findUserQuery = `SELECT * FROM users WHERE email = $1`;
@@ -41,7 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
             findUserQuery,
             [email]
         )
-        if(userResult.rows.length > 0) console.log(userResult.rows);
+        // if(userResult.rows.length > 0) console.log(userResult.rows);
        
         const query = `INSERT INTO users(email, password) VALUES($1, $2)`
 

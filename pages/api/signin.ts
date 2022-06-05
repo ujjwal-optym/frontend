@@ -33,7 +33,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     try {
         let { email, password } = req.body;
         const values = [email , password]
-        console.log(values);
         const findUserQuery = `SELECT * FROM users WHERE email = $1`;
         const userResult : any = await conn.query(
             findUserQuery,
