@@ -1,8 +1,9 @@
 import * as React from 'react'
 import Paper from '@mui/material/Paper'
 import { Bar } from 'react-chartjs-2'
-import { Chart, CategoryScale, LinearScale, BarElement } from 'chart.js'
-Chart.register(CategoryScale, LinearScale, BarElement)
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 type propsType = {
     data : any
@@ -41,8 +42,10 @@ const MyChart  = ( { data } : propsType) => {
     return (
         <div style={{margin: '4rem'}}>
             <Paper elevation={3}>
-            <Bar
+            <Doughnut
                 data={data2}
+                height="500px"
+                width= "500px"
                 options={{maintainAspectRatio: false}}
             />
             </Paper>

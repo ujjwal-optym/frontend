@@ -36,7 +36,7 @@ const findRows = (filter: any) : any => {
   let res = []
   for(let key in filter) {
     if(filter[key]) {
-      res.push(rows[Number(key)]);
+      res.push(rows[Number(key) - 1]);
     }
   }
   return res;
