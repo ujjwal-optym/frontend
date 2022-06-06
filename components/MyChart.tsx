@@ -9,8 +9,7 @@ type propsType = {
 }
 
 const MyChart  = ( { data } : propsType) => {
-    // console.log(data)
-    const data2 : any = {
+    const chartData : any = {
         labels: ['Stationary', 'Utils', 'Food', 'Equipment', 'Electronics'],
         datasets: [{
         label: 'dataset',
@@ -40,9 +39,9 @@ const MyChart  = ( { data } : propsType) => {
     
     return (
         <div style={{margin: '4rem'}}>
-            <Paper elevation={3}>
+            <Paper elevation={3} style= {{padding: '3rem'}}>
             <Doughnut
-                data={data2}
+                data={chartData}
                 height="500px"
                 width= "500px"
                 options={{maintainAspectRatio: false}}
